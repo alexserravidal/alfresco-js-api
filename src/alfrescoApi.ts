@@ -195,11 +195,11 @@ export class AlfrescoApi implements Emitter {
     }
 
     errorHandler(error: { status?: number }) {
-        if (error.status === 401) {
-            this.invalidateSession();
-        }
-
-        this.emit('error', error);
+        // if (error.status === 401) {
+        //     this.invalidateSession();
+        // }
+        //
+        // this.emit('error', error);
     }
 
     changeWithCredentialsConfig(withCredentials: boolean) {

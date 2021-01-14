@@ -22,6 +22,7 @@ import { Authentication } from './authentication';
 import { AuthenticationApi } from '../api/auth-rest-api/api/authentication.api';
 import { AlfrescoApi } from '../alfrescoApi';
 import { Storage } from '../storage';
+import {TicketEntry} from "../api/auth-rest-api/model";
 
 declare var require: any;
 // tslint:disable-next-line
@@ -707,9 +708,16 @@ export class Oauth2Auth extends AlfrescoApiClient {
         this.once('token_issued', async () => {
             const authContentApi: AuthenticationApi = new AuthenticationApi(alfrescoApi);
             authContentApi.apiClient.authentications = this.authentications;
-            const ticketEntry = await authContentApi.getTicket();
-            this.config.ticketEcm = ticketEntry.entry.id;
-            this.emit('ticket_exchanged');
+            authContentApi.getTicket()
+                .then((ticketEntry: TicketEntry) => {
+                    this.config.ticketEcm = ticketEntry.entry.id;
+                    this.emit('ticket_exchanged');
+                })
+                .catch((err: any) => {
+                    setTimeout(() => {
+                        this.exchangeTicketListener(alfrescoApi);
+                    }, 5000);
+                });
         });
     }
 }
